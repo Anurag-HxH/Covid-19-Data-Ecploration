@@ -1,7 +1,7 @@
 /*
 Covid 19 Data Exploration 
 
-Skills used: Joins, CTE's, Temp Tables, Subqueries, Aggregate Functions, Creating Views, Converting Data Types
+Skills used: Joins, CTE's, Temp Tables, Subqueries, Window Functions, Aggregate Functions, Creating Views, Converting Data Types
 
 */
 
