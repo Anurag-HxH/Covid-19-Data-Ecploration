@@ -8,7 +8,7 @@ Skills used: Joins, CTE's, Temp Tables, Subqueries, Aggregate Functions, Creatin
 
 
 
---Select Data To Get Started
+--Selecting Data To Get Started
 
 
 
@@ -134,7 +134,7 @@ Group By location
 
 --Join tables
 
--- Population VS Vaccination
+-- Population VS Vaccination Using Partition By
 
 Select dea.location, dea.population, dea.date, vac.new_vaccinations,
 SUM(cast(vac.new_vaccinations as bigint)) OVER (Partition By dea.location )
@@ -148,6 +148,9 @@ Order by 1,3
 
 
 
+-- Use of Order By Inside Partition By
+
+	
 Select dea.location, dea.population, dea.date, vac.new_vaccinations,
 SUM(cast(vac.new_vaccinations as bigint)) 
 OVER (Partition By dea.location  ORDER BY dea.location,dea.date) as RollingPeopleVaccinated
@@ -159,25 +162,30 @@ Where dea.continent is Not Null
 Order by 1,3
 
 
---Using Subquery To Find Percent Population Vaccinated
 
+
+
+	
+--Using Subquery To Find Percent Population Vaccinated
 
 
 Select *, (a.RollingPeopleVaccinated/a.population)* 100 as PercentVaccinated
 From  (Select dea.location, dea.population, dea.date, vac.new_vaccinations,
-		SUM(cast(vac.new_vaccinations as bigint)) 
-		OVER (Partition By dea.location  ORDER BY dea.location,dea.date) as RollingPeopleVaccinated
-		From PortfolioProject..CovidDeaths dea
-		Join PortfolioProject..CovidVaccinations vac
-			ON dea.location = vac.location
-			and dea.date = vac.date
-		Where dea.continent is Not Null
-		) as a
+	SUM(cast(vac.new_vaccinations as bigint)) 
+	OVER (Partition By dea.location  ORDER BY dea.location,dea.date) as RollingPeopleVaccinated
+	From PortfolioProject..CovidDeaths dea
+	Join PortfolioProject..CovidVaccinations vac
+		ON dea.location = vac.location
+		and dea.date = vac.date
+	Where dea.continent is Not Null
+	) as a
 
 
+
+
+
+	
  -- Using CTE to perform Calculation on Partition By in previous query
-
-
 
 
 With PopvsVac as
@@ -197,6 +205,7 @@ From PopvsVac
 
 
 
+	
 -- Using Temp Tables to perform Calculation on Partition By in previous query
 
 
