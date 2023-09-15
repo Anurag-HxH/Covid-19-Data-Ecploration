@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="C:/Users/Lenovo Pc/Downloads/shows.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="125"/><column_width id="3" width="1424"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/><expanded_item id="4" parent="1"/></tab_structure><tab_browse><current_table name="4,6:maingenres"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="genres" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="83"/><column index="2" value="106"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="people" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="52"/><column index="2" value="199"/><column index="3" value="52"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="ratings" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="83"/><column index="2" value="61"/><column index="3" value="57"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="shows" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="52"/><column index="2" value="300"/><column index="3" value="52"/><column index="4" value="86"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="stars" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="83"/><column index="2" value="96"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="writers" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="83"/><column index="2" value="96"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1">/*
+/*
+
 
 IMDB Data Exploration 
 
-Skills Used - Joins, Index, Subqueries, Window Functions, Aggregate functions,
-
+Skills Used - Joins, Index, Temp Tables, Subqueries, Window Functions, Aggregate functions.
+
 
 */
 
@@ -11,21 +12,28 @@ Skills Used - Joins, Index, Subqueries, Window Functions, Aggregate functions,
 
 -- Distinct genres and their count
 
-Select Distinct(genre), Count(genre) from genres
+SELECT Distinct(genre), Count(genre) 
+FROM genres
 Group By genre;
 
-
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 -- Min rating, Max rating and Avg ratings of all the content.
 
-SELECT min(rating)as minScore, max(rating) as maxScore, avg(rating) as AvgRating 
+SELECT min(rating)as minScore, max(rating) as maxScore, avg(rating) as AvgRating 
 FROM ratings;
-
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 -- Total votes casted On IMDB
-SELECT sum(votes) as Totalvotes 
+
+SELECT sum(votes) as Totalvotes 
 FROM ratings;
 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- All the shows Steve carell featured in
 
@@ -51,6 +59,7 @@ Where id in (Select show_id from stars Where person_id = (Select id from people 
 ORDER By title; 
 
 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 /* Joining Tables */
 
@@ -68,6 +77,7 @@ Where votes &gt;10000
 Order By rating desc, votes desc
 
 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 -- Highest rated Shows based on votes
@@ -80,7 +90,7 @@ On shows.id = ratings.show_id
 Order By votes desc
 
 
-
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 -- All the Shows Bryan Cranston featured in with ratings
@@ -88,55 +98,79 @@ Order By votes desc
 SELECT * FROM people
 JOIN stars ON people.id = stars.person_id
 JOIN shows ON stars.show_id = shows.id
-JOIN ratings ON stars.show_id = ratings.show_id
+JOIN ratings ON stars.show_id = ratings.show_id
 JOIN genres ON stars.show_id = genres.show_id
---WHERE name = 'Bryan Cranston'
+WHERE name = 'Bryan Cranston'
 GROUP By title, rating, year
 ORDER By rating DESC
 
-
--- Temp Tables
-
-CREATE TEMP TABLE Data
-(
-name TEXT,
-title TEXT,
-rating REAL,
-year NUMERIC,
-genre TEXT
-);
-
-
-INSERT INTO Data
-SELECT name, title, rating, year , genre FROM people
-JOIN stars ON people.id = stars.person_id
-JOIN shows ON stars.show_id = shows.id
-JOIN ratings ON stars.show_id = ratings.show_id
-JOIN genres ON stars.show_id = genres.show_id
---WHERE name = 'Bryan Cranston'
-GROUP By title, rating, year
---ORDER By rating DESC
-
-Select title,  genre,
-Avg(rating) OVER (Partition By genre) as AvgRating
-From Data
-
-
-Select *,
-row_number() OVER (Partition By year Order by rating DESC) as rowNum
-From Data
-
-
-
-
-
-
-
-
-
-
-
-
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-- Temp Tables
+
+
+
+CREATE TEMP TABLE Data
+
+(
+
+name TEXT,
+
+title TEXT,
+
+rating REAL,
+
+year NUMERIC,
+
+genre TEXT
+
+);
+
+
+
+
+
+INSERT INTO Data
+
+SELECT name, title, rating, year , genre FROM people
+
+JOIN stars ON people.id = stars.person_id
+
+JOIN shows ON stars.show_id = shows.id
+
+JOIN ratings ON stars.show_id = ratings.show_id
+
+JOIN genres ON stars.show_id = genres.show_id
+
+--WHERE name = 'Bryan Cranston'
+
+GROUP By title, rating, year
+
+--ORDER By rating DESC
+
+
+
+Select title,  genre,
+
+Avg(rating) OVER (Partition By genre) as AvgRating
+
+From Data
+
+
+
+
+
+Select *,
+
+row_number() OVER (Partition By year Order by rating DESC) as rowNum
+
+From Data
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 
 -- To make the search faster
