@@ -1,10 +1,8 @@
+
 /*
-
-
 IMDB Data Exploration 
 
 Skills Used - Joins, Index, Temp Tables, Subqueries, Window Functions, Aggregate functions.
-
 
 */
 
